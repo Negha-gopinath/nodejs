@@ -1,11 +1,13 @@
 
 
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
+
 
 let sequelize;
 sequelize = new Sequelize('mydb', 'username', 'mypassword', {
-  host: 'localhost',
-  dialect: 'postgres'
+    host: 'localhost',
+    dialect: 'postgres'
 });
 
 const connect = async () => {
