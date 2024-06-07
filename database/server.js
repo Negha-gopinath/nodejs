@@ -2,10 +2,12 @@
 
 const { Sequelize } = require('sequelize');
 
+
+
 let sequelize;
 sequelize = new Sequelize('mydb', 'username', 'mypassword', {
-  host: 'localhost',
-  dialect: 'postgres'
+    host: 'localhost',
+    dialect: 'postgres'
 });
 
 const connect = async () => {

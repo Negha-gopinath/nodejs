@@ -1,26 +1,48 @@
+const express = require('express');
+const authMiddleware = require('../middlewares/authMiddleware');
+const { body } = require('express-validator');
+
 module.exports = app => {
     const users = require("../controllers/index");
 
     var router = require("express").Router();
 
-    // Create a new Tutorial
-    router.post("/", users.create);
+    router.post('/signup', [
+      body('email').isString().trim().notEmpty(),
+      body('password').isLength({ min: 5 })
+    ], users.signup);
 
-    // Retrieve all Tutorials
-    router.get("/", users.findAll);
+    router.post('/login', [
+      body('email').isString().trim().notEmpty(),
+      body('password').exists()
+    ], users.login);
 
+    // Create a new User
+    router.post("/", [
+      body('email').isString().trim().notEmpty(),
+      body('username').isString().trim().notEmpty(),
+      body('password').isString().notEmpty()
+    ],authMiddleware,users.create);
 
-    // Retrieve a single Tutorial with id
-    router.get("/:id", users.findOne);
+    // Retrieve all Users
+    router.get("/", authMiddleware,users.findAll);
 
-    // Update a Tutorial with id
-    router.put("/:id", users.update);
+    // Retrieve a single User with id
+    router.get("/:id", authMiddleware,users.findOne);
 
-    // Delete a Tutorial with id
-    router.delete("/:id", users.delete);
+    // Update a User with id
+    router.put("/:id",[
+      body('email').isString().trim().notEmpty(),
+      body('username').isString().trim().notEmpty(),
+      body('password').isString().notEmpty()
+    ], authMiddleware,users.update);
 
-    // Delete all Tutorials
-    router.delete("/", users.deleteAll);
+    // Delete a User with id
+    router.delete("/:id", authMiddleware,users.delete);
+
+    // Delete all Users
+    router.delete("/", authMiddleware,users.deleteAll);
 
     app.use("/api/users", router);
   };
+
