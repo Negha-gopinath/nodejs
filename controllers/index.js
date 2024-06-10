@@ -61,18 +61,41 @@ exports.create = async (req, res) => {
 };
 
 // Retrieve all User from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async(req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1; // Default to page 1
+        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+        const offset = (page - 1) * limit;
 
-    User.findAll()
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving User."
-            });
+        const result = await User.findAndCountAll({
+          offset: offset,
+          limit: limit,
+     
         });
+
+        const totalItems = result.count;
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.status(200).json({
+          users: result.rows,
+          totalItems: totalItems,
+          totalPages: totalPages,
+          currentPage: page
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while fetching users.' });
+      }
+    // User.findAll()
+    //     .then(data => {
+    //         res.send(data);
+    //     })
+    //     .catch(err => {
+    //         res.status(500).send({
+    //             message:
+    //                 err.message || "Some error occurred while retrieving User."
+    //         });
+    //     });
 };
 
 // Find a single User with an id
